@@ -1,5 +1,7 @@
 package com.tickets.ticketingsystem.controller;
 
+import com.tickets.ticketingsystem.dto.JwtAuthenticationResponseDto;
+import com.tickets.ticketingsystem.dto.LoginRequestDto;
 import com.tickets.ticketingsystem.dto.UserRegistrationDto;
 import com.tickets.ticketingsystem.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,4 +27,13 @@ public class AuthController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
+
+    @PostMapping("/login")
+    public ResponseEntity<JwtAuthenticationResponseDto> login(@RequestBody LoginRequestDto loginRequestDto){
+        String token = userService.authenticate(loginRequestDto);
+        return ResponseEntity.ok(new JwtAuthenticationResponseDto(token));
+    }
+
+    
 }
