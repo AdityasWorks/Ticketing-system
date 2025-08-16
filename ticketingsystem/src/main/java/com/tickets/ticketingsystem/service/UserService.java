@@ -2,6 +2,7 @@ package com.tickets.ticketingsystem.service;
 
 import java.util.List;
 
+import com.tickets.ticketingsystem.dto.AdminCreateUserDto;
 import com.tickets.ticketingsystem.dto.LoginRequestDto;
 import com.tickets.ticketingsystem.dto.UserDto;
 import com.tickets.ticketingsystem.dto.UserRegistrationDto;
@@ -15,6 +16,9 @@ public interface UserService {
 
     List<UserDto> getAllUsers();
     User updateUserRole(Long userId, Role newRole);
+
+    UserDto addUser(AdminCreateUserDto userDto);
+    void removeUser(Long userId);
 
 
 }

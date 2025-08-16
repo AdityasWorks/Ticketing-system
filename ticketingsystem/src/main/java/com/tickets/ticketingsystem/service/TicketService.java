@@ -16,6 +16,8 @@ public interface TicketService {
 
     TicketDto forceReassignTicket(Long ticketId, Long assigneeId);
     TicketDto updateTicketStatus(Long ticketId, TicketStatus newStatus);
+
+    TicketDto updateTicketStatusByAgent(Long ticketId, TicketStatus newStatus, String username);
     
 
 }

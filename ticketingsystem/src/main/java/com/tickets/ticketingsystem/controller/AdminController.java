@@ -1,11 +1,11 @@
 package com.tickets.ticketingsystem.controller;
 
+import com.tickets.ticketingsystem.dto.AdminCreateUserDto;
 import com.tickets.ticketingsystem.dto.ReassignTicketDto;
 import com.tickets.ticketingsystem.dto.TicketDto;
 import com.tickets.ticketingsystem.dto.UpdateRoleDto;
 import com.tickets.ticketingsystem.dto.UpdateTicketStatusDto;
 import com.tickets.ticketingsystem.dto.UserDto;
-import com.tickets.ticketingsystem.model.TicketStatus;
 import com.tickets.ticketingsystem.service.TicketService;
 import com.tickets.ticketingsystem.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,4 +53,21 @@ public class AdminController {
         TicketDto updatedTicket = ticketService.updateTicketStatus(id, dto.getStatus());
         return ResponseEntity.ok(updatedTicket);
     }
+
+    @PostMapping("/users")
+    public ResponseEntity<UserDto> addUser(@RequestBody AdminCreateUserDto userDto) {
+        UserDto newUser = userService.addUser(userDto);
+        return ResponseEntity.ok(newUser);
+    }
+
+    @DeleteMapping("/users/{id}")
+    public ResponseEntity<?> removeUser(@PathVariable Long id) {
+        try {
+            userService.removeUser(id);
+            return ResponseEntity.ok("User removed successfully.");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
 }

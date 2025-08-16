@@ -2,6 +2,7 @@ package com.tickets.ticketingsystem.controller;
 
 import com.tickets.ticketingsystem.dto.CreateTicketDto;
 import com.tickets.ticketingsystem.dto.TicketDto;
+import com.tickets.ticketingsystem.dto.UpdateTicketStatusDto;
 import com.tickets.ticketingsystem.service.TicketService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -51,5 +52,14 @@ public class TicketController {
     public ResponseEntity<TicketDto> assignTicket(@PathVariable Long id, Principal principal){
         TicketDto assignedTicket = ticketService.assignTicket(id, principal.getName());
         return ResponseEntity.ok(assignedTicket);
+    }
+
+    @PutMapping("/{id}/status")
+    @PreAuthorize("hasAuthority('SUPPORT_AGENT') and @ticketSecurityService.isAssignee(#id, authentication.name)")
+    public ResponseEntity<TicketDto> updateTicketStatusByAgent(@PathVariable Long id, 
+                                                             @RequestBody UpdateTicketStatusDto dto, 
+                                                             Principal principal) {
+        TicketDto updatedTicket = ticketService.updateTicketStatusByAgent(id, dto.getStatus(), principal.getName());
+        return ResponseEntity.ok(updatedTicket);
     }
 }

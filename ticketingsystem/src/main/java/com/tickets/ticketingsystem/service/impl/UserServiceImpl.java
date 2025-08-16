@@ -1,5 +1,6 @@
 package com.tickets.ticketingsystem.service.impl;
 
+import com.tickets.ticketingsystem.dto.AdminCreateUserDto;
 import com.tickets.ticketingsystem.dto.LoginRequestDto;
 import com.tickets.ticketingsystem.dto.UserDto;
 import com.tickets.ticketingsystem.dto.UserRegistrationDto;
@@ -84,6 +85,32 @@ public class UserServiceImpl implements UserService{
 
         user.setRole(newRole);
         return userRepository.save(user);
+    }
+
+    @Override
+    @Transactional
+    public UserDto addUser(AdminCreateUserDto userDto) {
+        if (userRepository.findByEmail(userDto.getEmail()).isPresent()) {
+            throw new IllegalStateException("User with email " + userDto.getEmail() + " already exists.");
+        }
+
+        User user = new User();
+        user.setName(userDto.getName());
+        user.setEmail(userDto.getEmail());
+        user.setPassword(passwordEncoder.encode(userDto.getPassword()));
+        user.setRole(userDto.getRole());
+
+        User savedUser = userRepository.save(user);
+        return convertUserToDto(savedUser); // We already have this helper method
+    }
+
+    @Override
+    @Transactional
+    public void removeUser(Long userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new EntityNotFoundException("User not found with id: " + userId);
+        }
+        userRepository.deleteById(userId);
     }
 
     // Helper method to convert User entity to UserDto

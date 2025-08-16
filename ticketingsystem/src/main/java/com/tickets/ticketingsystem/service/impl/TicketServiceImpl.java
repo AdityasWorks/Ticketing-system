@@ -1,11 +1,13 @@
 package com.tickets.ticketingsystem.service.impl;
 
+import com.tickets.ticketingsystem.dto.CommentDto;
 import com.tickets.ticketingsystem.dto.CreateTicketDto;
 import com.tickets.ticketingsystem.dto.TicketDto;
 import com.tickets.ticketingsystem.model.Role;
 import com.tickets.ticketingsystem.model.Ticket;
 import com.tickets.ticketingsystem.model.TicketStatus;
 import com.tickets.ticketingsystem.model.User;
+import com.tickets.ticketingsystem.repository.CommentRepository;
 import com.tickets.ticketingsystem.repository.TicketRepository;
 import com.tickets.ticketingsystem.repository.UserRepository;
 import com.tickets.ticketingsystem.service.TicketService;
@@ -28,6 +30,10 @@ public class TicketServiceImpl implements TicketService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private CommentRepository commentRepository;
+
 
 
     @Override
@@ -107,6 +113,21 @@ public class TicketServiceImpl implements TicketService {
         }
         dto.setCreatedAt(ticket.getCreatedAt());
         dto.setUpdatedAt(ticket.getUpdatedAt());
+        
+
+        List<CommentDto> comments = commentRepository.findByTicketIdOrderByCreatedAtAsc(ticket.getId())
+            .stream()
+            .map(comment -> {
+                CommentDto commentDto = new CommentDto();
+                commentDto.setId(comment.getId());
+                commentDto.setText(comment.getText());
+                commentDto.setAuthorName(comment.getAuthor().getName());
+                commentDto.setCreatedAt(comment.getCreatedAt());
+                return commentDto;
+            })
+            .collect(Collectors.toList());
+        dto.setComments(comments);
+
         return dto;
     }
 
@@ -144,4 +165,23 @@ public class TicketServiceImpl implements TicketService {
         Ticket updatedTicket = ticketRepository.save(ticket);
         return convertToDto(updatedTicket);
     }
+
+    @Override
+    @Transactional
+    public TicketDto updateTicketStatusByAgent(Long ticketId, TicketStatus newStatus, String agentUsername) {
+        Ticket ticket = ticketRepository.findById(ticketId)
+                .orElseThrow(() -> new EntityNotFoundException("Ticket not found with id: " + ticketId));
+
+        User agent = userRepository.findByEmail(agentUsername)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + agentUsername));
+
+        if (ticket.getAssignee() == null || !ticket.getAssignee().getId().equals(agent.getId())) {
+            throw new IllegalStateException("You are not assigned to this ticket.");
+        }
+
+        ticket.setStatus(newStatus);
+        Ticket updatedTicket = ticketRepository.save(ticket);
+        return convertToDto(updatedTicket);
+    }
+    
 }

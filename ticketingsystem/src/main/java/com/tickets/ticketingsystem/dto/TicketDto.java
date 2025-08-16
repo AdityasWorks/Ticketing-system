@@ -1,6 +1,7 @@
 package com.tickets.ticketingsystem.dto;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import com.tickets.ticketingsystem.model.Priority;
 import com.tickets.ticketingsystem.model.TicketStatus;
@@ -18,4 +19,5 @@ public class TicketDto {
     private String assigneeName; // Can be null
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private List<CommentDto> comments;
 }
