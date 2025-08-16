@@ -1,17 +1,25 @@
 package com.tickets.ticketingsystem.service.impl;
 
 import com.tickets.ticketingsystem.dto.LoginRequestDto;
+import com.tickets.ticketingsystem.dto.UserDto;
 import com.tickets.ticketingsystem.dto.UserRegistrationDto;
 import com.tickets.ticketingsystem.model.Role;
 import com.tickets.ticketingsystem.model.User;
 import com.tickets.ticketingsystem.repository.UserRepository;
 import com.tickets.ticketingsystem.service.JwtService;
 import com.tickets.ticketingsystem.service.UserService;
+
+import jakarta.persistence.EntityNotFoundException;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class UserServiceImpl implements UserService{
@@ -57,6 +65,35 @@ public class UserServiceImpl implements UserService{
         var user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new IllegalStateException("User not found after authentication"));
         return jwtService.generateToken(user);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<UserDto> getAllUsers() {
+        return userRepository.findAll()
+                .stream()
+                .map(this::convertUserToDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public User updateUserRole(Long userId, Role newRole) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
+
+        user.setRole(newRole);
+        return userRepository.save(user);
+    }
+
+    // Helper method to convert User entity to UserDto
+    private UserDto convertUserToDto(User user) {
+        UserDto userDto = new UserDto();
+        userDto.setId(user.getId());
+        userDto.setName(user.getName());
+        userDto.setEmail(user.getEmail());
+        userDto.setRole(user.getRole());
+        return userDto;
     }
 
 }
