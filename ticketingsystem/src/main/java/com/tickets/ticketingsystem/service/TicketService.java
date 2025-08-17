@@ -2,12 +2,14 @@ package com.tickets.ticketingsystem.service;
 
 import java.util.List;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import com.tickets.ticketingsystem.dto.CreateTicketDto;
 import com.tickets.ticketingsystem.dto.TicketDto;
 import com.tickets.ticketingsystem.model.TicketStatus;
 
 public interface TicketService {
-    TicketDto createTicket(CreateTicketDto createTicketDto, String username);
+    TicketDto createTicket(CreateTicketDto createTicketDto, String username, MultipartFile file);
     List<TicketDto> getTicketsForUser(String username);
 
     List<TicketDto> getAllTickets();

@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
 import java.util.List;
@@ -19,10 +20,9 @@ public class TicketController {
     @Autowired
     private TicketService ticketService;
 
-    @PostMapping
-    public ResponseEntity<TicketDto> createTicket(@RequestBody CreateTicketDto createTicketDto, Principal principal) {
-        // principal.getName() will give us the email of the currently logged-in user
-        TicketDto createdTicket = ticketService.createTicket(createTicketDto, principal.getName());
+    @PostMapping(consumes = {"multipart/form-data"})
+    public ResponseEntity<TicketDto> createTicket(@RequestPart("ticket") CreateTicketDto createTicketDto, @RequestPart(value = "file", required = false) MultipartFile file, Principal principal) {
+        TicketDto createdTicket = ticketService.createTicket(createTicketDto, principal.getName(), file);
         return ResponseEntity.ok(createdTicket);
     }
 

@@ -3,13 +3,17 @@ package com.tickets.ticketingsystem.service.impl;
 import com.tickets.ticketingsystem.dto.CommentDto;
 import com.tickets.ticketingsystem.dto.CreateTicketDto;
 import com.tickets.ticketingsystem.dto.TicketDto;
+import com.tickets.ticketingsystem.model.Attachment;
 import com.tickets.ticketingsystem.model.Role;
 import com.tickets.ticketingsystem.model.Ticket;
 import com.tickets.ticketingsystem.model.TicketStatus;
 import com.tickets.ticketingsystem.model.User;
+import com.tickets.ticketingsystem.repository.AttachmentRepository;
 import com.tickets.ticketingsystem.repository.CommentRepository;
 import com.tickets.ticketingsystem.repository.TicketRepository;
 import com.tickets.ticketingsystem.repository.UserRepository;
+import com.tickets.ticketingsystem.service.EmailService;
+import com.tickets.ticketingsystem.service.FileStorageService;
 import com.tickets.ticketingsystem.service.TicketService;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -18,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,11 +39,20 @@ public class TicketServiceImpl implements TicketService {
     @Autowired
     private CommentRepository commentRepository;
 
+    @Autowired
+    private EmailService emailService;
+
+    @Autowired
+    private FileStorageService fileStorageService;;
+
+    @Autowired
+    private AttachmentRepository attachmentRepository;
+
 
 
     @Override
     @Transactional
-    public TicketDto createTicket(CreateTicketDto createTicketDto, String username) {
+    public TicketDto createTicket(CreateTicketDto createTicketDto, String username, MultipartFile file) {
         User requester = userRepository.findByEmail(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + username));
 
@@ -50,8 +64,36 @@ public class TicketServiceImpl implements TicketService {
         ticket.setRequester(requester);
 
         Ticket savedTicket = ticketRepository.save(ticket);
+        
+        //file upload
+
+        if (file != null && !file.isEmpty()) {
+        String fileUrl = fileStorageService.uploadFile(file);
+        Attachment attachment = new Attachment();
+        attachment.setFileName(file.getOriginalFilename());
+        attachment.setFileType(file.getContentType());
+        attachment.setFileUrl(fileUrl);
+        attachment.setTicket(savedTicket);
+        attachmentRepository.save(attachment);
+    }
+
+
+
+        // email
+        String emailSubject = String.format("Ticket #%d Created: %s", savedTicket.getId(), savedTicket.getSubject());
+        String emailText = String.format("Hello %s,\n\nYour support ticket has been successfully created.\n\nTicket ID: %d\nSubject: %s\nPriority: %s\n\nWe will get back to you shortly.\n\nThe Ticketing System Team",
+            requester.getName(),
+            savedTicket.getId(),
+            savedTicket.getSubject(),
+            savedTicket.getPriority()
+        );
+        emailService.sendSimpleMailMessage(requester.getEmail(), emailSubject, emailText);
+
+        
         return convertToDto(savedTicket);
     }
+
+    
 
     @Override
     @Transactional(readOnly = true)
