@@ -1,5 +1,6 @@
 package com.tickets.ticketingsystem.service.impl;
 
+import com.tickets.ticketingsystem.dto.AttachmentDto;
 import com.tickets.ticketingsystem.dto.CommentDto;
 import com.tickets.ticketingsystem.dto.CreateTicketDto;
 import com.tickets.ticketingsystem.dto.TicketDto;
@@ -169,6 +170,20 @@ public class TicketServiceImpl implements TicketService {
             })
             .collect(Collectors.toList());
         dto.setComments(comments);
+
+
+        // Attachments
+        List<AttachmentDto> attachmentDtos = attachmentRepository.findByTicketId(ticket.getId())
+                .stream()
+                .map(attachment -> {
+                    AttachmentDto attachmentDto = new AttachmentDto();
+                    attachmentDto.setId(attachment.getId());
+                    attachmentDto.setFileName(attachment.getFileName());
+                    attachmentDto.setFileUrl(attachment.getFileUrl());
+                    return attachmentDto;
+                })
+                .collect(Collectors.toList());
+        dto.setAttachments(attachmentDtos);
 
         return dto;
     }

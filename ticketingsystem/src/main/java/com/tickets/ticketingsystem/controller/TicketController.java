@@ -41,7 +41,7 @@ public class TicketController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'SUPPORT_AGENT')")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'SUPPORT_AGENT') or @ticketSecurityService.isOwnerOrAssignee(#id, authentication.name)")
     public ResponseEntity<TicketDto> getTicketById(@PathVariable Long id){
         TicketDto ticket = ticketService.getTicketById(id);
         return ResponseEntity.ok(ticket);

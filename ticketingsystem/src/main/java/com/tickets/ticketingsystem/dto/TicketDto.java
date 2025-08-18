@@ -20,4 +20,5 @@ public class TicketDto {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private List<CommentDto> comments;
+    private List<AttachmentDto> attachments;
 }
