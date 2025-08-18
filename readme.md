@@ -82,7 +82,8 @@ The project is designed to be run locally without requiring a Docker environment
 
     # For JWT Security
     export JWT_SECRET_KEY="your_long_and_secure_base64_encoded_jwt_secret"
-    use this if you want to save this this is randomly generated ```26vMztoL0UQqNUZAKmIIbErDKH5r7V4l26vMztoL0UQqNUZAKmIIbErDKH5r7V4l```
+    use this if you want to save time, this is randomly generated 
+    26vMztoL0UQqNUZAKmIIbErDKH5r7V4l26vMztoL0UQqNUZAKmIIbErDKH5r7V4l
     
     # For Email Notifications (using a free Mailtrap.io account is recommended for testing)
     export MAILTRAP_USERNAME="your_mailtrap_username"
@@ -95,7 +96,8 @@ The project is designed to be run locally without requiring a Docker environment
     ```bash
     mvn spring-boot:run
     ```
-    or just use "run java" in the IDE
+    
+    or just use "run java" in the IDE,
     The backend API will be available at `http://localhost:8080`.
 
 ### Frontend Setup
