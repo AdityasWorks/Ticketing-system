@@ -46,7 +46,8 @@ The project was built according to the provided assignment specification, implem
     * Support for a full comment thread on each ticket with author and timestamp information.
     * Tracks the ticket requester (owner) and assignee.
 * **Admin Panel**
-    * **User Management:** Admins can view all users, add new users with a specific role, remove users, and change the role of any existing user.
+    * **User Management:** Admins can view all users, add new users with a specific role, remove users, and change the role of any existing user.<br>
+      minor issue: in the frontend to manage users you need to manually go to 'http://localhost:3000/dashboard/users'
     * **Ticket Management:** Admins can view all tickets, force reassign any ticket, and forcibly change the status of any ticket.
 * **Access Control**
     * Secured endpoints ensure that only authorized roles can perform specific actions (e.g., only admins can manage users, only assigned agents can update ticket status).
