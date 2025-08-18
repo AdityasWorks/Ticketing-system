@@ -43,8 +43,8 @@ public class TicketServiceImpl implements TicketService {
     @Autowired
     private EmailService emailService;
 
-    @Autowired
-    private FileStorageService fileStorageService;;
+    @Autowired(required = false)
+    private FileStorageService fileStorageService;
 
     @Autowired
     private AttachmentRepository attachmentRepository;
@@ -68,15 +68,15 @@ public class TicketServiceImpl implements TicketService {
         
         //file upload
 
-        if (file != null && !file.isEmpty()) {
-        String fileUrl = fileStorageService.uploadFile(file);
-        Attachment attachment = new Attachment();
-        attachment.setFileName(file.getOriginalFilename());
-        attachment.setFileType(file.getContentType());
-        attachment.setFileUrl(fileUrl);
-        attachment.setTicket(savedTicket);
-        attachmentRepository.save(attachment);
-    }
+        if (fileStorageService != null && file != null && !file.isEmpty()) {
+            String fileUrl = fileStorageService.uploadFile(file);
+            Attachment attachment = new Attachment();
+            attachment.setFileName(file.getOriginalFilename());
+            attachment.setFileType(file.getContentType());
+            attachment.setFileUrl(fileUrl);
+            attachment.setTicket(savedTicket);
+            attachmentRepository.save(attachment);
+        }
 
 
 

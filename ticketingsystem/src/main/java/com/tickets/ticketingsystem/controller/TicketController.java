@@ -21,6 +21,7 @@ public class TicketController {
     private TicketService ticketService;
 
     @PostMapping(consumes = {"multipart/form-data"})
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<TicketDto> createTicket(@RequestPart("ticket") CreateTicketDto createTicketDto, @RequestPart(value = "file", required = false) MultipartFile file, Principal principal) {
         TicketDto createdTicket = ticketService.createTicket(createTicketDto, principal.getName(), file);
         return ResponseEntity.ok(createdTicket);
